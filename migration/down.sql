@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS accounts, games, cards, choices, game_choices CASCADE;
+DROP TABLE IF EXISTS users, games, cards, choices, game_choices CASCADE;

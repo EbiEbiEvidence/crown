@@ -1,6 +1,6 @@
-CREATE TABLE accounts
+CREATE TABLE users
 (
-    account_id SERIAL NOT NULL PRIMARY KEY,
+    user_id SERIAL NOT NULL PRIMARY KEY,
     email VARCHAR(256) UNIQUE NOT NULL,
     display_name VARCHAR(32) NOT NULL,
     token TEXT NOT NULL
@@ -10,7 +10,7 @@ CREATE TABLE accounts
 CREATE TABLE games
 (
     game_id SERIAL NOT NULL PRIMARY KEY,
-    account_id SERIAL NOT NULL REFERENCES accounts(account_id),
+    user_id SERIAL NOT NULL REFERENCES users(user_id),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     score INTEGER NOT NULL DEFAULT 0,
     emperor_imina VARCHAR(16) NOT NULL,
