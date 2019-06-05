@@ -1,22 +1,16 @@
 package command
 
 type GameCommandModel struct {
-	UserID       int64
-	Score        int64
-	EmperorImina string
-	EmperorGengo string
+	UserID int64
+	Score  int64
 }
 
 func NewGameCommandModel(
 	userID int64,
 	score int64,
-	emperorImina string,
-	emperorGengo string,
 ) *GameCommandModel {
 	return &GameCommandModel{
-		UserID:       userID,
-		Score:        score,
-		EmperorImina: emperorImina,
-		EmperorGengo: emperorGengo,
+		UserID: userID,
+		Score:  score,
 	}
 }
