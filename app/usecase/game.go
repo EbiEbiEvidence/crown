@@ -32,7 +32,7 @@ func NewGameUseCase(
 func (uc *GameUseCase) Start(token string) (gameQueryModel *query.GameQueryModel, err error) {
 	ret, err := uc.gameRepo.ExecTx(
 		func(tx *sqlx.Tx) (gameQueryModel interface{}, err error) {
-			userQueryModel, err := uc.userRepo.FindByToken(token)
+			userQueryModel, err := uc.userRepo.FindByToken(token, tx)
 			if err != nil {
 				return nil, err
 			}
@@ -41,7 +41,7 @@ func (uc *GameUseCase) Start(token string) (gameQueryModel *query.GameQueryModel
 				return nil, errors.New("user not found")
 			}
 
-			gameQueryModel, err = uc.gameRepo.SaveTx(userQueryModel.UserID, tx)
+			gameQueryModel, err = uc.gameRepo.Save(userQueryModel.UserID, tx)
 			if err != nil {
 				return nil, err
 			}
@@ -51,12 +51,12 @@ func (uc *GameUseCase) Start(token string) (gameQueryModel *query.GameQueryModel
 			}
 
 			for i := 0; i < 270; i++ {
-				cardQueryModel, err := uc.cardRepo.FindRootRandomlyTx(tx)
+				cardQueryModel, err := uc.cardRepo.FindRootRandomly(tx)
 				if err != nil {
 					return nil, err
 				}
 
-				uc.deckRepo.SaveTx(gameQueryModel.(*query.GameQueryModel).GameID, cardQueryModel.CardID, tx)
+				uc.deckRepo.Save(gameQueryModel.(*query.GameQueryModel).GameID, cardQueryModel.CardID, tx)
 			}
 
 			return gameQueryModel, nil

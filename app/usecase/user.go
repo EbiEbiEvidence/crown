@@ -26,9 +26,9 @@ func (uc *UserUseCase) FindByTokenOrName(token string, name string) (userQueryMo
 	}
 
 	if token != "" {
-		userQueryModel, err = uc.userRepo.FindByToken(token)
+		userQueryModel, err = uc.userRepo.FindByToken(token, nil)
 	} else {
-		userQueryModel, err = uc.userRepo.FindByName(name)
+		userQueryModel, err = uc.userRepo.FindByName(name, nil)
 	}
 
 	if err != nil || userQueryModel == nil {
@@ -43,7 +43,7 @@ func (uc *UserUseCase) Save(name string) (userQueryModel *query.UserQueryModel, 
 		return nil, errors.New("name must not be empty")
 	}
 
-	formerUser, err := uc.userRepo.FindByNameCaseInsensitive(name)
+	formerUser, err := uc.userRepo.FindByNameCaseInsensitive(name, nil)
 	if err != nil && !strings.Contains(err.Error(), "no rows in result set") {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (uc *UserUseCase) Save(name string) (userQueryModel *query.UserQueryModel, 
 		return nil, err
 	}
 
-	userID, err := uc.userRepo.Save(command.NewUserCommandModel(name, tokenToSave.String()))
+	userID, err := uc.userRepo.Save(command.NewUserCommandModel(name, tokenToSave.String()), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -64,5 +64,5 @@ func (uc *UserUseCase) Save(name string) (userQueryModel *query.UserQueryModel, 
 		return nil, errors.New("Failed to get userID")
 	}
 
-	return uc.userRepo.FindByID(*userID)
+	return uc.userRepo.FindByID(*userID, nil)
 }
