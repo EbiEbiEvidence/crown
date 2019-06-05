@@ -1,9 +1,11 @@
+BEGIN;
+
 CREATE TABLE users
 (
     user_id SERIAL NOT NULL PRIMARY KEY,
     email VARCHAR(256) UNIQUE NOT NULL,
     display_name VARCHAR(32) NOT NULL,
-    token TEXT NOT NULL
+    token TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -12,9 +14,7 @@ CREATE TABLE games
     game_id SERIAL NOT NULL PRIMARY KEY,
     user_id SERIAL NOT NULL REFERENCES users(user_id),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    score INTEGER NOT NULL DEFAULT 0,
-    emperor_imina VARCHAR(16) NOT NULL,
-    emperor_gengo VARCHAR(16) NOT NULL
+    score INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE cards
@@ -24,6 +24,13 @@ CREATE TABLE cards
     scenario_id INTEGER,
     card_text VARCHAR(256) NOT NULL,
     card_image VARCHAR(16) NOT NULL
+);
+
+CREATE TABLE decks
+(
+    deck_id SERIAL NOT NULL PRIMARY KEY,
+    game_id SERIAL NOT NULL REFERENCES games(game_id),
+    card_id SERIAL NOT NULL REFERENCES cards(card_id)
 );
 
 CREATE TABLE choices
@@ -47,3 +54,5 @@ CREATE TABLE game_choices
     game_id SERIAL REFERENCES games(game_id),
     choice_id SERIAL REFERENCES choices(choice_id)
 );
+
+COMMIT;
