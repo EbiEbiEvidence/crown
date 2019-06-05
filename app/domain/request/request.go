@@ -8,3 +8,7 @@ type GetUser struct {
 type CreateUser struct {
 	Name string `json:"name"`
 }
+
+type StartGame struct {
+	Token string `json:"token",omitempty`
+}

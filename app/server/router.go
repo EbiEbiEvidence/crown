@@ -9,11 +9,21 @@ import (
 )
 
 func (s *SimpleServer) Router() *httprouter.Router {
-	h := httprouter.New()
-	userRepository := repository.NewUserRepository(s.db)
-	userUseCase := usecase.NewUserUseCase(userRepository)
+	r := httprouter.New()
+	userRepo := repository.NewUserRepository(s.db)
+	gameRepo := repository.NewGameRepository(s.db)
+	cardRepo := repository.NewCardRepository(s.db)
+	deckRepo := repository.NewDeckRepository(s.db)
+
+	userUseCase := usecase.NewUserUseCase(userRepo)
+	gameUseCase := usecase.NewGameUseCase(gameRepo, cardRepo, deckRepo, userRepo)
+
 	userHandler := handler.NewUserHandler(userUseCase)
-	h.POST("/user/get", userHandler.Get)
-	h.POST("/user/create", userHandler.Create)
-	return h
+	gameHandler := handler.NewGameHandler(gameUseCase)
+
+	r.POST("/user/get", userHandler.Get)
+	r.POST("/user/create", userHandler.Create)
+	r.POST("/game/new", gameHandler.Start)
+
+	return r
 }

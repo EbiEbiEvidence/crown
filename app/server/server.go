@@ -1,17 +1,17 @@
 package server
 
 import (
-	"database/sql"
 	"fmt"
 
-	_ "github.com/lib/pq"
-
 	"crowns/config"
+
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 type SimpleServer struct {
 	serverConfig *config.ServerConfig
-	db           *sql.DB
+	db           *sqlx.DB
 }
 
 func (s *SimpleServer) Init(serverConfig *config.ServerConfig) {
@@ -24,7 +24,7 @@ func (s *SimpleServer) Init(serverConfig *config.ServerConfig) {
 		serverConfig.DatabaseConfig.DbName,
 	)
 	var dbErr error
-	s.db, dbErr = sql.Open("postgres", connPath)
+	s.db, dbErr = sqlx.Open("postgres", connPath)
 	if dbErr == nil {
 		dbErr = s.db.Ping()
 	}
@@ -33,7 +33,7 @@ func (s *SimpleServer) Init(serverConfig *config.ServerConfig) {
 	}
 }
 
-func (s *SimpleServer) GetDbForTest() *sql.DB {
+func (s *SimpleServer) GetDbForTest() *sqlx.DB {
 	return s.db
 }
 

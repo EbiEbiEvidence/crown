@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"runtime"
 )
 
 func unmarshallRequest(requestStruct interface{}, w http.ResponseWriter, r *http.Request) error {
@@ -20,11 +21,17 @@ func unmarshallRequest(requestStruct interface{}, w http.ResponseWriter, r *http
 
 type errorMessage struct {
 	Message string `json:"message"`
+	Line    int    `json:"line"`
+	Func    string `json:"func"`
 }
 
 func marshallErrorResponse(message string, w http.ResponseWriter) {
+	_, fn, line, _ := runtime.Caller(1)
+
 	ret, err := json.Marshal(errorMessage{
 		Message: message,
+		Func:    fn,
+		Line:    line,
 	})
 
 	if err != nil {
