@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"runtime"
+	"runtime/debug"
 )
 
 func unmarshallRequest(requestStruct interface{}, w http.ResponseWriter, r *http.Request) error {
@@ -36,6 +37,7 @@ func marshallErrorResponse(message string, w http.ResponseWriter) {
 		Func:    fn,
 		Line:    line,
 	})
+	debug.PrintStack()
 
 	if err != nil {
 		http.Error(w, `{"message": "Error on writeErrorMessage"}`, http.StatusBadRequest)
