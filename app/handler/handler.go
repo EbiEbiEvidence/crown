@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"runtime"
 )
@@ -41,7 +42,9 @@ func marshallErrorResponse(message string, w http.ResponseWriter) {
 		return
 	}
 
-	http.Error(w, string(ret), http.StatusBadRequest)
+	log.Print("[ERROR]", res)
+
+	http.Error(w, res, http.StatusBadRequest)
 }
 
 func marshallResponse(res interface{}, w http.ResponseWriter) {
