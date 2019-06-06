@@ -27,7 +27,7 @@ func (repo *HighScoreRepository) Save(highScoreCommand command.HighScoreCommandM
 		ranked_high_scores AS (
 			SELECT
 				*,
-				RANK() OVER(PARTITION BY user_id ORDER BY score) AS rank
+				RANK() OVER(PARTITION BY user_id ORDER BY score DESC, high_score_id DESC) AS rank
 			FROM high_scores
 		),
 		low_rank_highscore_ids AS (
@@ -68,7 +68,7 @@ func (repo *HighScoreRepository) Save(highScoreCommand command.HighScoreCommandM
 }
 
 func (repo *HighScoreRepository) IndexUser(userID int64, tx *sqlx.Tx) (highScoreQueryModels []query.HighScoreQueryModel, err error) {
-	const sqlQuery = "SELECT high_score_id AS HighScoreID, user_id AS UserID, created_at AS CreatedAt, score AS Score FROM high_scores WHERE user_id = $1 ORDER BY score LIMIT 5"
+	const sqlQuery = "SELECT high_score_id AS HighScoreID, user_id AS UserID, created_at AS CreatedAt, score AS Score FROM high_scores WHERE user_id = $1 ORDER BY score DESC LIMIT 5"
 	highScoreQueryModels = []query.HighScoreQueryModel{}
 	if tx == nil {
 		err = repo.db.Select(&highScoreQueryModels, sqlQuery, userID)
@@ -82,7 +82,7 @@ func (repo *HighScoreRepository) IndexUser(userID int64, tx *sqlx.Tx) (highScore
 }
 
 func (repo *HighScoreRepository) Index(tx *sqlx.Tx) (highScoreQueryModels []query.HighScoreQueryModel, err error) {
-	const sqlQuery = "SELECT high_score_id AS HighScoreID, user_id AS UserID, created_at AS CreatedAt, score AS Score FROM high_scores ORDER BY score LIMIT 10"
+	const sqlQuery = "SELECT high_score_id AS HighScoreID, user_id AS UserID, created_at AS CreatedAt, score AS Score FROM high_scores ORDER BY score DESC LIMIT 10"
 	highScoreQueryModels = []query.HighScoreQueryModel{}
 	if tx == nil {
 		err = repo.db.Select(&highScoreQueryModels, sqlQuery)
