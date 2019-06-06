@@ -12,3 +12,12 @@ type CreateUser struct {
 type StartGame struct {
 	Token string `json:"token",omitempty`
 }
+
+type GetHighScores struct {
+	Token string `json:"token",omitempty`
+}
+
+type SubmitHighScores struct {
+	Token string `json:"token",omitempty`
+	Score int64  `json:"score"`
+}
