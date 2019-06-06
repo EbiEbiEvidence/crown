@@ -20,6 +20,20 @@ func NewHighScoreHandler(userUseCase *usecase.UserUseCase, highScoreUseCase *use
 	}
 }
 
+func (h *HighScoreHandler) GetHighScores(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	highScores, err := h.highScoreUseCase.Index()
+	if err != nil {
+		marshallErrorResponse(err.Error(), w)
+		return
+	}
+	if highScores == nil {
+		marshallErrorResponse("could not found highScores", w)
+		return
+	}
+
+	marshallResponse(highScores, w)
+}
+
 func (h *HighScoreHandler) Submit(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	req := request.SubmitHighScores{}
 	err := unmarshallRequest(&req, w, r)
