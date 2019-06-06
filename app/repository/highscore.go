@@ -82,7 +82,27 @@ func (repo *HighScoreRepository) IndexUser(userID int64, tx *sqlx.Tx) (highScore
 }
 
 func (repo *HighScoreRepository) Index(tx *sqlx.Tx) (highScoreQueryModels []query.HighScoreQueryModel, err error) {
-	const sqlQuery = "SELECT high_score_id AS HighScoreID, user_id AS UserID, created_at AS CreatedAt, score AS Score FROM high_scores ORDER BY score DESC LIMIT 10"
+	const sqlQuery = `
+		WITH
+			ranked_high_scores AS (
+				SELECT
+					*,
+					RANK() OVER(PARTITION BY user_id ORDER BY score DESC, high_score_id DESC) AS user_rank
+				FROM high_scores
+			)
+		SELECT
+			high_score_id AS HighScoreID,
+			user_id AS UserID,
+			created_at AS CreatedAt,
+			score AS Score
+		FROM
+			ranked_high_scores
+		WHERE
+			user_rank = 1
+		ORDER BY score DESC
+		LIMIT 5
+	`
+
 	highScoreQueryModels = []query.HighScoreQueryModel{}
 	if tx == nil {
 		err = repo.db.Select(&highScoreQueryModels, sqlQuery)
