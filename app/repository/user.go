@@ -20,14 +20,18 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 	}
 }
 
-func (repo *UserRepository) FindByName(name string) (userQueryModel *query.UserQueryModel, err error) {
+func (repo *UserRepository) FindByName(name string, tx *sqlx.Tx) (userQueryModel *query.UserQueryModel, err error) {
 	userID := &sql.NullInt64{}
 	email := &sql.NullString{}
 	displayName := &sql.NullString{}
 	token := &sql.NullString{}
 	createdAt := &pq.NullTime{}
+	if tx == nil {
+		err = repo.db.QueryRow("SELECT user_id, email, display_name, token, created_at FROM users WHERE users.display_name = $1", name).Scan(userID, email, displayName, token, createdAt)
+	} else {
+		err = tx.QueryRow("SELECT user_id, email, display_name, token, created_at FROM users WHERE users.display_name = $1", name).Scan(userID, email, displayName, token, createdAt)
+	}
 
-	err = repo.db.QueryRow("SELECT user_id, email, display_name, token, created_at FROM users WHERE users.display_name = $1", name).Scan(userID, email, displayName, token, createdAt)
 	if err != nil {
 		return nil, err
 	}
