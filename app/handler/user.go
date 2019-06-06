@@ -10,12 +10,14 @@ import (
 )
 
 type UserHandler struct {
-	userUseCase *usecase.UserUseCase
+	userUseCase      *usecase.UserUseCase
+	highScoreUseCase *usecase.HighScoreUseCase
 }
 
-func NewUserHandler(userUseCase *usecase.UserUseCase) *UserHandler {
+func NewUserHandler(userUseCase *usecase.UserUseCase, highScoreUseCase *usecase.HighScoreUseCase) *UserHandler {
 	return &UserHandler{
 		userUseCase,
+		highScoreUseCase,
 	}
 }
 
