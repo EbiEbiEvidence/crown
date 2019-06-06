@@ -26,6 +26,8 @@ type errorMessage struct {
 }
 
 func marshallErrorResponse(message string, w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+
 	_, fn, line, _ := runtime.Caller(1)
 
 	ret, err := json.Marshal(errorMessage{
@@ -43,5 +45,7 @@ func marshallErrorResponse(message string, w http.ResponseWriter) {
 }
 
 func marshallResponse(res interface{}, w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&res)
 }

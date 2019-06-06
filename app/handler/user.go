@@ -10,12 +10,14 @@ import (
 )
 
 type UserHandler struct {
-	userUseCase *usecase.UserUseCase
+	userUseCase      *usecase.UserUseCase
+	highScoreUseCase *usecase.HighScoreUseCase
 }
 
-func NewUserHandler(userUseCase *usecase.UserUseCase) *UserHandler {
+func NewUserHandler(userUseCase *usecase.UserUseCase, highScoreUseCase *usecase.HighScoreUseCase) *UserHandler {
 	return &UserHandler{
 		userUseCase,
+		highScoreUseCase,
 	}
 }
 
@@ -65,4 +67,36 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request, _ httproute
 	userRes := response.NewUser(userQueryModel.DisplayName)
 
 	marshallResponse(userRes, w)
+}
+
+func (h *UserHandler) GetHighScores(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	req := request.GetHighScores{}
+
+	if err := unmarshallRequest(&req, w, r); err != nil {
+		marshallErrorResponse(err.Error(), w)
+		return
+	}
+
+	if req.Token == "" {
+		marshallErrorResponse("token must not be empty", w)
+		return
+	}
+
+	user, err := h.userUseCase.FindByTokenOrName(req.Token, "")
+	if err != nil {
+		marshallErrorResponse(err.Error(), w)
+		return
+	}
+
+	highScores, err := h.highScoreUseCase.IndexUser(user.UserID)
+	if err != nil {
+		marshallErrorResponse(err.Error(), w)
+		return
+	}
+	if highScores == nil {
+		marshallErrorResponse("could not found highScores", w)
+		return
+	}
+
+	marshallResponse(highScores, w)
 }

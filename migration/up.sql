@@ -17,6 +17,14 @@ CREATE TABLE games
     score INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE high_scores
+(
+    high_score_id SERIAL NOT NULL PRIMARY KEY,
+    user_id SERIAL NOT NULL REFERENCES users(user_id),
+    score INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE cards
 (
     card_id SERIAL NOT NULL PRIMARY KEY,
