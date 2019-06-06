@@ -32,11 +32,15 @@ func marshallErrorResponse(message string, w http.ResponseWriter) {
 
 	_, fn, line, _ := runtime.Caller(1)
 
-	ret, err := json.Marshal(errorMessage{
+	errMsg := errorMessage{
 		Message: message,
 		Func:    fn,
 		Line:    line,
-	})
+	}
+
+	resAsBytes, err := json.Marshal(errMsg)
+	res := string(resAsBytes)
+
 	debug.PrintStack()
 
 	if err != nil {
