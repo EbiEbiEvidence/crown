@@ -40,7 +40,9 @@ func (h *UserHandler) Get(w http.ResponseWriter, r *http.Request, _ httprouter.P
 		return
 	}
 
-	userRes := response.NewUser(userQueryModel.DisplayName)
+	userRes := response.User{
+		Name: userQueryModel.DisplayName,
+	}
 
 	marshallResponse(userRes, w)
 }
@@ -64,7 +66,10 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request, _ httproute
 		return
 	}
 
-	userRes := response.NewUser(userQueryModel.DisplayName)
+	userRes := response.User{
+		Name:  userQueryModel.DisplayName,
+		Token: userQueryModel.Token,
+	}
 
 	marshallResponse(userRes, w)
 }
