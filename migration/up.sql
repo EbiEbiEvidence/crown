@@ -19,10 +19,17 @@ CREATE TABLE games
 
 CREATE TABLE high_scores
 (
-    high_score_id SERIAL NOT NULL PRIMARY KEY,
-    user_id SERIAL NOT NULL REFERENCES users(user_id),
-    score INTEGER NOT NULL DEFAULT 0,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    high_score_id   SERIAL NOT NULL PRIMARY KEY,
+    user_id         SERIAL NOT NULL REFERENCES users(user_id),
+    start_          INTEGER NOT NULL DEFAULT 0,
+	age             INTEGER NOT NULL DEFAULT 0,
+    score           INTEGER NOT NULL DEFAULT 0,
+	church_score    INTEGER NOT NULL DEFAULT 0,
+	commers_score   INTEGER NOT NULL DEFAULT 0,
+	merchants_score INTEGER NOT NULL DEFAULT 0,
+	military_score  INTEGER NOT NULL DEFAULT 0,
+	bonus_score     INTEGER NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE cards
