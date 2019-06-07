@@ -21,7 +21,27 @@ func NewHighScoreRepository(db *sqlx.DB) *HighScoreRepository {
 }
 
 func (repo *HighScoreRepository) Save(highScoreCommand command.HighScoreCommandModel, tx *sqlx.Tx) (highScoreQueryModel *query.HighScoreQueryModel, err error) {
-	const sqlQueryToSave = "INSERT INTO high_scores (user_id, score) VALUES ($1, $2) RETURNING high_score_id AS HighScoreID, user_id AS UserID, created_at AS CreatedAt, score AS Score"
+	const sqlQueryToSave = `
+		INSERT INTO high_scores (
+			user_id,
+			start_,
+			age,
+			church_score,
+			commers_score,
+			merchants_score,
+			military_score,
+			bonus_score
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		RETURNING
+			high_score_id AS HighScoreID,
+			user_id AS UserID,
+			start_ AS Start,
+			age AS Age,
+			church_score AS ChurchScore,
+			commers_score AS CommersScore,
+			merchants_score AS MerchantsScore,
+			military_score AS MilitaryScore,
+			bonus_score AS BonusScore`
 	const sqlQueryToRemoveLowRank = `
 		WITH
 		ranked_high_scores AS (
@@ -51,7 +71,17 @@ func (repo *HighScoreRepository) Save(highScoreCommand command.HighScoreCommandM
 		return ret.(*query.HighScoreQueryModel), nil
 	}
 
-	err = tx.QueryRowx(sqlQueryToSave, highScoreCommand.UserID, highScoreCommand.Score).StructScan(highScoreQueryModel)
+	err = tx.QueryRowx(
+		sqlQueryToSave,
+		highScoreCommand.UserID,
+		highScoreCommand.Start,
+		highScoreCommand.Age,
+		highScoreCommand.ChurchScore,
+		highScoreCommand.CommersScore,
+		highScoreCommand.MerchantsScore,
+		highScoreCommand.MilitaryScore,
+		highScoreCommand.BonusScore,
+	).StructScan(highScoreQueryModel)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +98,18 @@ func (repo *HighScoreRepository) Save(highScoreCommand command.HighScoreCommandM
 }
 
 func (repo *HighScoreRepository) IndexUser(userID int64, tx *sqlx.Tx) (highScoreQueryModels []query.HighScoreQueryModel, err error) {
-	const sqlQuery = "SELECT high_score_id AS HighScoreID, user_id AS UserID, created_at AS CreatedAt, score AS Score FROM high_scores WHERE user_id = $1 ORDER BY score DESC LIMIT 5"
+	const sqlQuery = `
+		SELECT
+			high_score_id AS HighScoreID,
+			user_id AS UserID,
+			start_ AS Start,
+			age AS Age,
+			church_score AS ChurchScore,
+			commers_score AS CommersScore,
+			merchants_score AS MerchantsScore,
+			military_score AS MilitaryScore,
+			bonus_score AS BonusScore
+		FROM high_scores WHERE user_id = $1 ORDER BY age DESC, score DESC, user_id LIMIT 5`
 	highScoreQueryModels = []query.HighScoreQueryModel{}
 	if tx == nil {
 		err = repo.db.Select(&highScoreQueryModels, sqlQuery, userID)
@@ -93,13 +134,18 @@ func (repo *HighScoreRepository) Index(tx *sqlx.Tx) (highScoreQueryModels []quer
 		SELECT
 			high_score_id AS HighScoreID,
 			user_id AS UserID,
-			created_at AS CreatedAt,
-			score AS Score
+			start_ AS Start,
+			age AS Age,
+			church_score AS ChurchScore,
+			commers_score AS CommersScore,
+			merchants_score AS MerchantsScore,
+			military_score AS MilitaryScore,
+			bonus_score AS BonusScore
 		FROM
 			ranked_high_scores
 		WHERE
 			user_rank = 1
-		ORDER BY score DESC
+		ORDER BY age DESC, score DESC, user_id
 		LIMIT 5
 	`
 
