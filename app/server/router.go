@@ -29,6 +29,7 @@ func (s *SimpleServer) Router() *httprouter.Router {
 	r.POST("/user/highscores", userHandler.GetHighScores)
 	r.POST("/game/new", gameHandler.Start)
 	r.POST("/highscores/submit", highScoreHandler.Submit)
+	r.GET("/highscores", highScoreHandler.GetHighScores)
 
 	return r
 }

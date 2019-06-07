@@ -19,6 +19,18 @@ func NewHighScoreUseCase(highScoreRepo *repository.HighScoreRepository) *HighSco
 	}
 }
 
+func (uc *HighScoreUseCase) Index() (highScoreQueryModels []query.HighScoreQueryModel, err error) {
+	highScoreQueryModels, err = uc.highScoreRepo.Index(nil)
+	if err != nil {
+		return nil, err
+	}
+	if highScoreQueryModels == nil {
+		return nil, errors.New("Failed to index highScoreQueryModels")
+	}
+
+	return highScoreQueryModels, nil
+}
+
 func (uc *HighScoreUseCase) IndexUser(userID int64) (highScoreQueryModels []query.HighScoreQueryModel, err error) {
 	highScoreQueryModels, err = uc.highScoreRepo.IndexUser(userID, nil)
 	if err != nil {

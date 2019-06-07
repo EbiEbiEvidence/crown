@@ -3,8 +3,10 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"runtime"
+	"runtime/debug"
 )
 
 func unmarshallRequest(requestStruct interface{}, w http.ResponseWriter, r *http.Request) error {
@@ -30,18 +32,25 @@ func marshallErrorResponse(message string, w http.ResponseWriter) {
 
 	_, fn, line, _ := runtime.Caller(1)
 
-	ret, err := json.Marshal(errorMessage{
+	errMsg := errorMessage{
 		Message: message,
 		Func:    fn,
 		Line:    line,
-	})
+	}
+
+	resAsBytes, err := json.Marshal(errMsg)
+	res := string(resAsBytes)
+
+	debug.PrintStack()
 
 	if err != nil {
 		http.Error(w, `{"message": "Error on writeErrorMessage"}`, http.StatusBadRequest)
 		return
 	}
 
-	http.Error(w, string(ret), http.StatusBadRequest)
+	log.Print("[ERROR]", res)
+
+	http.Error(w, res, http.StatusBadRequest)
 }
 
 func marshallResponse(res interface{}, w http.ResponseWriter) {

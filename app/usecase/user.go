@@ -32,7 +32,7 @@ func (uc *UserUseCase) FindByTokenOrName(token string, name string) (userQueryMo
 	}
 
 	if err != nil || userQueryModel == nil {
-		return nil, errors.New("not found")
+		return nil, errors.New("user not found")
 	}
 
 	return userQueryModel, nil
