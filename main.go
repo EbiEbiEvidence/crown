@@ -16,7 +16,7 @@ func main() {
 
 func RunServer() error {
 	s := &server.SimpleServer{}
-	s.Init(config.Load())
+	s.Init(config.Load("development"))
 
 	http.Handle("/", s.Router())
 
