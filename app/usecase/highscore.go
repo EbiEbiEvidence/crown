@@ -43,10 +43,34 @@ func (uc *HighScoreUseCase) IndexUser(userID int64) (highScoreQueryModels []quer
 	return highScoreQueryModels, nil
 }
 
-func (uc *HighScoreUseCase) Submit(userID int64, score int64) (highScoreQueryModels []query.HighScoreQueryModel, err error) {
+func (uc *HighScoreUseCase) Submit(
+	userID int64,
+	start int64,
+	age int64,
+	score int64,
+	churchScore int64,
+	commersScore int64,
+	merchantsScore int64,
+	militaryScore int64,
+	bonusScore int64,
+) (highScoreQueryModels []query.HighScoreQueryModel, err error) {
 	ret, err := uc.highScoreRepo.ExecTx(
 		func(tx *sqlx.Tx) (highScoreQueryModelsI interface{}, err error) {
-			_, err = uc.highScoreRepo.Save(*command.NewHighScoreCommandModel(userID, score), tx)
+			_, err = uc.highScoreRepo.Save(
+				command.HighScoreCommandModel{
+					UserID:         userID,
+					Start:          start,
+					Age:            age,
+					Score:          score,
+					ChurchScore:    churchScore,
+					CommersScore:   commersScore,
+					MerchantsScore: merchantsScore,
+					MilitaryScore:  militaryScore,
+					BonusScore:     bonusScore,
+				},
+				tx,
+			)
+
 			if err != nil {
 				return nil, err
 			}
@@ -54,11 +78,11 @@ func (uc *HighScoreUseCase) Submit(userID int64, score int64) (highScoreQueryMod
 			return uc.highScoreRepo.IndexUser(userID, tx)
 		})
 
-	highScoreQueryModels = ret.([]query.HighScoreQueryModel)
-
 	if err != nil {
 		return nil, err
 	}
+	highScoreQueryModels = ret.([]query.HighScoreQueryModel)
+
 	if highScoreQueryModels == nil {
 		return nil, errors.New("Failed to save highScoreQueryModel")
 	}

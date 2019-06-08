@@ -1,9 +1,10 @@
 package apptest
 
 import (
+	"crowns/app/domain/request"
 	"crowns/app/domain/response"
+	"encoding/json"
 	"fmt"
-	"strconv"
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
@@ -51,15 +52,26 @@ func getUserByToken(router *httprouter.Router, token string) (*response.User, er
 	return &res, nil
 }
 
-func submitHighScore(router *httprouter.Router, token string, score int64) ([]response.HighScore, error) {
+func submitHighScore(router *httprouter.Router, token string, reqStruct request.SubmitHighScores) ([]response.HighScore, error) {
+	req, err := json.Marshal(request.SubmitHighScores{
+		Token:          token,
+		Start:          reqStruct.Start,
+		Age:            reqStruct.Age,
+		ChurchScore:    reqStruct.ChurchScore,
+		CommersScore:   reqStruct.CommersScore,
+		MerchantsScore: reqStruct.MerchantsScore,
+		MilitaryScore:  reqStruct.MilitaryScore,
+		BonusScore:     reqStruct.BonusScore,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	r, err := SendRequest(
 		router,
 		"POST",
 		"/highscores/submit",
-		`{
-			"token": "`+token+`",
-			"score": `+strconv.FormatInt(score, 10)+`
-		}`)
+		string(req))
 	if err != nil {
 		return nil, err
 	}
@@ -144,14 +156,129 @@ func TestHighScores(t *testing.T) {
 
 	router := Prepare()
 	userNames := []string{"いぬ", "ねこ", "とら", "さる", "きじ", "たか", "おおかみ"}
-	highScoreLists := [][]int64{
-		{10, 60, 30, 90, 20, 15, 80, 90},
-		{100, 30, 80, 70, 90, 100, 110, 100},
-		{40, 20, 110, 40, 50, 60, 100},
-		{20, 70, 80, 10, 90, 80, 130},
-		{110, 20, 110, 40, 50, 60, 100},
-		{40, 90, 80, 90, 150, 200, 30},
-		{40, 20, 50, 140, 20, 30, 150},
+	highScoreLists := [][]request.SubmitHighScores{
+		{
+			request.SubmitHighScores{
+				Start:          2193,
+				Age:            19,
+				ChurchScore:    82,
+				CommersScore:   96,
+				MerchantsScore: 85,
+				MilitaryScore:  90,
+				BonusScore:     261,
+			},
+			request.SubmitHighScores{
+				Start:          2194,
+				Age:            33,
+				ChurchScore:    64,
+				CommersScore:   17,
+				MerchantsScore: 36,
+				MilitaryScore:  99,
+				BonusScore:     576,
+			},
+			request.SubmitHighScores{
+				Start:          2029,
+				Age:            13,
+				ChurchScore:    30,
+				CommersScore:   90,
+				MerchantsScore: 40,
+				MilitaryScore:  35,
+				BonusScore:     527,
+			},
+			request.SubmitHighScores{
+				Start:          2144,
+				Age:            19,
+				ChurchScore:    1,
+				CommersScore:   92,
+				MerchantsScore: 32,
+				MilitaryScore:  11,
+				BonusScore:     775,
+			},
+		},
+		{
+			request.SubmitHighScores{
+				Start:          1956,
+				Age:            49,
+				ChurchScore:    24,
+				CommersScore:   33,
+				MerchantsScore: 43,
+				MilitaryScore:  22,
+				BonusScore:     665,
+			},
+			request.SubmitHighScores{
+				Start:          2034,
+				Age:            6,
+				ChurchScore:    32,
+				CommersScore:   93,
+				MerchantsScore: 96,
+				MilitaryScore:  17,
+				BonusScore:     649,
+			},
+		},
+		{
+			request.SubmitHighScores{
+				Start:          2064,
+				Age:            15,
+				ChurchScore:    94,
+				CommersScore:   20,
+				MerchantsScore: 41,
+				MilitaryScore:  19,
+				BonusScore:     405,
+			},
+			request.SubmitHighScores{
+				Start:          1917,
+				Age:            10,
+				ChurchScore:    5,
+				CommersScore:   85,
+				MerchantsScore: 43,
+				MilitaryScore:  44,
+				BonusScore:     698,
+			},
+		},
+		{
+			request.SubmitHighScores{
+				Start:          2052,
+				Age:            44,
+				ChurchScore:    85,
+				CommersScore:   14,
+				MerchantsScore: 98,
+				MilitaryScore:  8,
+				BonusScore:     115,
+			},
+		},
+		{
+			request.SubmitHighScores{
+				Start:          2084,
+				Age:            34,
+				ChurchScore:    78,
+				CommersScore:   2,
+				MerchantsScore: 12,
+				MilitaryScore:  32,
+				BonusScore:     430,
+			},
+		},
+		{
+			request.SubmitHighScores{
+				Start:          1905,
+				Age:            10,
+				ChurchScore:    65,
+				CommersScore:   81,
+				MerchantsScore: 30,
+				MilitaryScore:  75,
+				BonusScore:     454,
+			},
+		},
+		{
+			request.SubmitHighScores{
+				Start:          2065,
+				Age:            21,
+				ChurchScore:    48,
+				CommersScore:   16,
+				MerchantsScore: 49,
+				MilitaryScore:  36,
+				BonusScore:     898,
+			},
+		},
 	}
 
 	for u, userName := range userNames {
@@ -160,20 +287,20 @@ func TestHighScores(t *testing.T) {
 			t.Errorf(err.Error())
 		}
 
-		for _, score := range highScoreLists[u] {
-			submitHighScore(router, user.Token, score)
+		for _, reqStruct := range highScoreLists[u] {
+			submitHighScore(router, user.Token, reqStruct)
 		}
 	}
 
+	expectedIds := []int64{9, 10, 12, 4, 8}
 	res, err := getHighScores(router)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 
-	truthHighScores := []int64{200, 150, 130, 110, 110}
 	for h, highScore := range res {
-		if truthHighScores[h] != highScore.Score {
-			t.Errorf("excepted: %d, actual: %d", truthHighScores[h], highScore.Score)
+		if highScore.HighScoreID != expectedIds[h] {
+			t.Errorf("expected %d, actual %d", highScore.HighScoreID, expectedIds[h])
 		}
 	}
 }
