@@ -1,7 +1,11 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/ebiebievidence/crowns)](https://goreportcard.com/report/github.com/ebiebievidence/crowns)
+
 # なにこれ
 研修用
 
 # 構成
+
+なんちゃってClean Architecture + なんちゃってCQRS。
 
 ```plain
 ├── app
